@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import net.dbtw.orm.entity.DownloadSet;
 import net.dbtw.orm.repository.DownloadSetRepo;
 import net.dbtw.orm.repository.DownloadStateRepoCustom;
 import net.dbtw.schedules.DmhyWorker;
