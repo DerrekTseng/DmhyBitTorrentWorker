@@ -29,8 +29,6 @@ public class MagnetDownloadClient {
 
 	private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-	private final Module dhtModule;
-
 	private final BtRuntime runtime;
 
 	private final BtClient client;
@@ -88,7 +86,7 @@ public class MagnetDownloadClient {
 			}
 		};
 
-		dhtModule = new DHTModule(new DHTConfig() {
+		Module dhtModule = new DHTModule(new DHTConfig() {
 			@Override
 			public int getListeningPort() {
 				return dhtPortOverride.orElseGet(super::getListeningPort);

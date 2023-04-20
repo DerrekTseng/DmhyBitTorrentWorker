@@ -32,23 +32,26 @@
 						</a>
 					</li>
 					<li>
-						<a href="/dmhyItems" class="nav-link text-white">
-							Dmhy Items
-						</a>
-					</li>
-					<li>
 						<a href="/downloadSetting" class="nav-link active">
 							Download Setting
-						</a>
-					</li>
-					<li>
-						<a href="/downloadState" class="nav-link text-white">
-							Download State
 						</a>
 					</li>
 				</ul>
 			</div>
 			<div class="p-3" style="width:calc(100vw - 280px); height:100vh;flex-shrink: 0;display: flex; overflow: auto;">
+				<form action="/runWorker" method="post">
+					<input type="submit" value="Run Worker"/>
+				</form>				
+				<form action="/newSetting" method="post">
+					<input />
+					<input />
+					<input />
+					<input />
+				</form>
+				
+				<form action="/updateSetting" method="post" th:each="item : ${items}">
+				
+				</form>
 				
 			</div>
 		</main>

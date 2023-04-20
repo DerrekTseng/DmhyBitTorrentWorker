@@ -3,10 +3,11 @@ package net.dbtw.schedules;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dbtw.component.DownloadComponent;
+import net.dbtw.component.DownloadService;
 import net.dbtw.crawlers.dmhy.DmhyPageRoller;
 import net.dbtw.orm.entity.DmhyItem;
 import net.dbtw.orm.entity.DownloadState;
@@ -40,9 +41,9 @@ public class DmhyWorker {
 	DownloadStateRepoCustom downloadStateRepoCustom;
 
 	@Autowired
-	DownloadComponent downloadComponent;
+	DownloadService downloadService;
 
-	// @Scheduled(cron = "${dmhy.worker.cron.expression}")
+	@Scheduled(cron = "${dmhy.worker.cron.expression}")
 	public synchronized void doWork() {
 		fetchDmhyItems();
 		updateDownloadState();
@@ -108,7 +109,7 @@ public class DmhyWorker {
 			downloadStateRepo.save(downloadState);
 
 			if (downloadState.getState() == State.Downloading) {
-				downloadComponent.download(downloadState, dmhyItem);
+				downloadService.download(downloadState, dmhyItem);
 			}
 		});
 	}

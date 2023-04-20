@@ -20,21 +20,9 @@ public class WebController {
 		return view;
 	}
 
-	@GetMapping("dmhyItems")
-	public ModelAndView dmhyItems() {
-		ModelAndView view = new ModelAndView("dmhyItems");
-		return view;
-	}
-
 	@GetMapping("downloadSetting")
 	public ModelAndView dmhySetting() {
 		ModelAndView view = new ModelAndView("downloadSetting");
-		return view;
-	}
-
-	@GetMapping("downloadState")
-	public ModelAndView dmhyState() {
-		ModelAndView view = new ModelAndView("downloadState");
 		return view;
 	}
 

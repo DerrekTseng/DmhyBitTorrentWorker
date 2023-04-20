@@ -25,7 +25,7 @@ import net.dbtw.orm.repository.DownloadStateRepo;
 @Slf4j
 @Component
 @Scope("singleton")
-public class DownloadComponent implements DisposableBean {
+public class DownloadService implements DisposableBean {
 
 	private static final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
