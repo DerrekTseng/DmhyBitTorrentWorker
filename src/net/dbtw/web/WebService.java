@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.dbtw.dto.DownloadingBean;
-import net.dbtw.orm.entity.DmhyItem;
+import net.dbtw.orm.entity.TorrentItem;
 import net.dbtw.orm.entity.DownloadState.State;
-import net.dbtw.orm.repository.DmhyItemRepo;
+import net.dbtw.orm.repository.TorrentItemRepo;
 import net.dbtw.orm.repository.DownloadStateRepoCustom;
 
 @Service
@@ -19,16 +19,16 @@ public class WebService {
 	DownloadStateRepoCustom downloadStateRepoCustom;
 
 	@Autowired
-	DmhyItemRepo dmhyItemRepo;
+	TorrentItemRepo torrentItemRepo;
 
 	public List<DownloadingBean> getDownloadingBeans() {
 
 		return downloadStateRepoCustom.findByState(State.Downloading).stream().map(downloadState -> {
 
-			DmhyItem dmhyItem = dmhyItemRepo.findById(downloadState.getRefDmhyItem()).orElse(new DmhyItem());
+			TorrentItem torrentItem = torrentItemRepo.findById(downloadState.getTorrentId()).orElse(new TorrentItem());
 
 			DownloadingBean downloadingBean = new DownloadingBean();
-			downloadingBean.setName(dmhyItem.getTitle());
+			downloadingBean.setName(torrentItem.getName());
 			downloadingBean.setPercent(downloadState.getPercentage());
 
 			return downloadingBean;

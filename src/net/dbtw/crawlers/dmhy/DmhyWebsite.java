@@ -92,7 +92,7 @@ public class DmhyWebsite {
 			// add to List
 			dmhyItemBeans.add(dmhyItemBean);
 
-			log.info("Found DmhyItem: {}", dmhyItemBean);
+			log.info("Found TorrentItem: {}", dmhyItemBean);
 		}
 
 		return dmhyItemBeans;

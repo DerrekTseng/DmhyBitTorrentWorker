@@ -7,13 +7,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dbtw.bittorrent.MagnetParser;
+import net.dbtw.bittorrent.MagnetUri;
 import net.dbtw.component.DownloadService;
 import net.dbtw.crawlers.dmhy.DmhyPageRoller;
-import net.dbtw.orm.entity.DmhyItem;
+import net.dbtw.orm.entity.TorrentItem;
 import net.dbtw.orm.entity.DownloadState;
 import net.dbtw.orm.entity.DownloadState.State;
-import net.dbtw.orm.repository.DmhyItemRepo;
-import net.dbtw.orm.repository.DmhyItemRepoCustom;
+import net.dbtw.orm.repository.TorrentItemRepo;
+import net.dbtw.orm.repository.TorrentItemRepoCustom;
 import net.dbtw.orm.repository.DownloadSetRepo;
 import net.dbtw.orm.repository.DownloadStateRepo;
 import net.dbtw.orm.repository.DownloadStateRepoCustom;
@@ -26,10 +28,10 @@ public class DmhyWorker {
 	DmhyPageRoller dmhyPageRoller;
 
 	@Autowired
-	DmhyItemRepo dmhyItemRepo;
+	TorrentItemRepo torrentItemRepo;
 
 	@Autowired
-	DmhyItemRepoCustom dmhyItemRepoCustom;
+	TorrentItemRepoCustom torrentItemRepoCustom;
 
 	@Autowired
 	DownloadSetRepo downloadSetRepo;
@@ -43,7 +45,7 @@ public class DmhyWorker {
 	@Autowired
 	DownloadService downloadService;
 
-	@Scheduled(cron = "${dmhy.worker.cron.expression}")
+	@Scheduled(cron = "0/10 * * * * *")
 	public synchronized void doWork() {
 		fetchDmhyItems();
 		updateDownloadState();
@@ -56,19 +58,17 @@ public class DmhyWorker {
 		dmhyPageRoller.rolling(1, 10, (pageNum, list) -> {
 			list.forEach(item -> {
 				if (keepRolling.get()) {
-					if (dmhyItemRepoCustom.urlExists(item.getUrl())) {
-						log.info("Found item existed, stop fetching.");
+					MagnetUri magnetUri = MagnetParser.convert(item.getUrl());
+					String torrentId = magnetUri.getTorrentId().toString();
+					if (torrentItemRepo.existsById(torrentId)) {
+						log.info("Torrent item existed, stop fetching.");
 						keepRolling.set(false);
 					} else {
-						DmhyItem dmhyItem = new DmhyItem();
-						dmhyItem.setCategory(item.getCategory());
-						dmhyItem.setTitle(item.getTitle());
-						dmhyItem.setUrl(item.getUrl());
-						dmhyItem.setMagnet(item.getMagnet());
-						dmhyItem.setTime(item.getTime());
-						dmhyItem.setSize(item.getSize());
-						dmhyItem.setDownloadState("none");
-						dmhyItemRepo.save(dmhyItem);
+						TorrentItem torrentItem = new TorrentItem();
+						torrentItem.setTorrentId(torrentId);
+						torrentItem.setCategory(item.getCategory());
+						torrentItem.setName(item.getTitle());
+						torrentItemRepo.save(torrentItem);
 					}
 				}
 			});
@@ -81,14 +81,13 @@ public class DmhyWorker {
 	// Step Two
 	public synchronized void updateDownloadState() {
 		downloadSetRepo.findAll().forEach(downloadSet -> {
-			dmhyItemRepoCustom.searchCategoryTitleLike(downloadSet.getCategory(), downloadSet.getPrefix(), downloadSet.getSuffix()).forEach(dmhyItem -> {
-				if (downloadStateRepoCustom.getByRefDmhyItem(dmhyItem.getRowid()) == null) {
+			torrentItemRepoCustom.searchLike(downloadSet.getCategory(), downloadSet.getPrefix(), downloadSet.getSuffix()).forEach(torrentItem -> {
+				if (downloadStateRepo.existsById(torrentItem.getTorrentId())) {
 					DownloadState downloadState = new DownloadState();
+					downloadState.setTorrentId(torrentItem.getTorrentId());
 					downloadState.setDownloadingFolder(downloadSet.getDownloadingFolder());
 					downloadState.setCompleteFolder(downloadSet.getCompletedFolder());
 					downloadState.setPercentage("0.00");
-					downloadState.setRefDmhyItem(dmhyItem.getRowid());
-					downloadState.setRefDownloadSet(downloadSet.getRowid());
 					downloadState.setState(State.Wait);
 					downloadStateRepo.save(downloadState);
 				}
@@ -100,16 +99,16 @@ public class DmhyWorker {
 	public synchronized void startDownload() {
 		downloadStateRepoCustom.findByState(State.Wait).forEach(downloadState -> {
 
-			DmhyItem dmhyItem = dmhyItemRepo.findById(downloadState.getRefDmhyItem()).orElse(null);
-			if (dmhyItem == null) {
-				downloadState.setState(State.DmhyItemNotFound);
+			TorrentItem torrentItem = torrentItemRepo.findById(downloadState.getTorrentId()).orElse(null);
+			if (torrentItem == null) {
+				downloadState.setState(State.TorrentItemNotFound);
 			} else {
 				downloadState.setState(State.Downloading);
 			}
 			downloadStateRepo.save(downloadState);
 
 			if (downloadState.getState() == State.Downloading) {
-				downloadService.download(downloadState, dmhyItem);
+				downloadService.download(downloadState, torrentItem);
 			}
 		});
 	}

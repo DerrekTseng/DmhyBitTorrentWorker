@@ -8,6 +8,6 @@ import net.dbtw.orm.entity.DownloadState;
 
 @Repository
 @Transactional
-public interface DownloadStateRepo extends JpaRepository<DownloadState, Integer> {
+public interface DownloadStateRepo extends JpaRepository<DownloadState, String> {
 
 }

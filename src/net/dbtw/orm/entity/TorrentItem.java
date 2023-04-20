@@ -9,23 +9,15 @@ import lombok.Data;
 
 @Data
 @Entity
-public class DownloadState {
-
-	public static enum State {
-		Wait, Downloading, Finish, TorrentItemNotFound, Error;
-	}
+public class TorrentItem {
 
 	@Id
 	String torrentId;
 
 	@Type(type = "text")
-	String downloadingFolder;
+	String category;
 
 	@Type(type = "text")
-	String completeFolder;
-
-	String percentage;
-
-	State state;
+	String name;
 
 }

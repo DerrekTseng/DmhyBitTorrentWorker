@@ -14,12 +14,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dbtw.bittorrent.MagnetParser;
-import net.dbtw.bittorrent.MagnetUri;
 import net.dbtw.bittorrent.download.MagnetDownloadClient;
-import net.dbtw.orm.entity.DmhyItem;
 import net.dbtw.orm.entity.DownloadState;
 import net.dbtw.orm.entity.DownloadState.State;
+import net.dbtw.orm.entity.TorrentItem;
 import net.dbtw.orm.repository.DownloadStateRepo;
 
 @Slf4j
@@ -32,15 +30,13 @@ public class DownloadService implements DisposableBean {
 	@Autowired
 	DownloadStateRepo downloadStateRepo;
 
-	public void download(DownloadState downloadState, DmhyItem dmhyItem) {
+	public void download(DownloadState downloadState, TorrentItem torrentItem) {
 
 		AtomicBoolean running = new AtomicBoolean(true);
 
 		executorService.execute(() -> {
 
-			MagnetUri magnetUri = MagnetParser.convert(dmhyItem.getMagnet());
-
-			String url = "magnet:?xt=urn:btih:" + magnetUri.getTorrentId().toString();
+			String url = "magnet:?xt=urn:btih:" + torrentItem.getTorrentId();
 
 			MagnetDownloadClient magnetDownloadClient = new MagnetDownloadClient(url, new File(downloadState.getDownloadingFolder()));
 
@@ -52,7 +48,7 @@ public class DownloadService implements DisposableBean {
 				downloadState.setPercentage(percentage);
 				downloadStateRepo.save(downloadState);
 
-				log.info("downloading " + percentage + "% - " + dmhyItem.getTitle());
+				log.info("downloading " + percentage + "% - " + torrentItem.getName());
 			}, ((state, throwable) -> {
 
 				double completePercents = state.getCompletePercents();
@@ -63,14 +59,14 @@ public class DownloadService implements DisposableBean {
 
 				if (throwable != null) {
 					downloadState.setState(State.Error);
-					log.info("error " + dmhyItem.getTitle());
+					log.info("error " + torrentItem.getName());
 				} else {
 					downloadState.setState(State.Finish);
 
 					File downoladedFile = new File(downloadState.getDownloadingFolder(), state.getName());
 					File completedFile = new File(downloadState.getCompleteFolder(), state.getName());
 
-					log.info("downloaded " + dmhyItem.getTitle());
+					log.info("downloaded " + torrentItem.getName());
 					try {
 						if (downoladedFile.isFile()) {
 							FileUtils.moveFile(downoladedFile, completedFile);
