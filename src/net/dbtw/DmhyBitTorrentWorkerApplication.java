@@ -35,20 +35,7 @@ public class DmhyBitTorrentWorkerApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void afterStartup() {
-
-		// TODO
-		DownloadSet downloadSet = new DownloadSet();
-
-		downloadSet.setDownloadingFolder("C:\\Users\\a0926\\Desktop\\AA\\downloading");
-		downloadSet.setCompletedFolder("C:\\Users\\a0926\\Desktop\\AA\\conpleted");
-		downloadSet.setCategory("動畫");
-		downloadSet.setPrefix("[Lilith-Raws] 無神世界的神明活動 / Kaminaki Sekai no Kamisama Katsudou - ");
-		downloadSet.setSuffix("[Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]");
-		//downloadSetRepo.save(downloadSet);
-
 		downloadStateRepoCustom.resetState();
-
-		// dmhyWorker.doWork();
 	}
 
 }
