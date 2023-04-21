@@ -2,6 +2,7 @@ package net.dbtw.component;
 
 import java.io.File;
 import java.math.RoundingMode;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,8 +47,10 @@ public class DownloadService implements DisposableBean {
 				df.setRoundingMode(RoundingMode.FLOOR);
 				String percentage = df.format(completePercents);
 				downloadState.setPercentage(percentage);
-				downloadStateRepo.save(downloadState);
-
+				if (downloadState.getState() != State.Finish) {
+					downloadState.setState(State.Downloading);
+					downloadStateRepo.save(downloadState);
+				}
 				log.info("downloading " + percentage + "% - " + torrentItem.getName());
 			}, ((state, throwable) -> {
 
@@ -69,9 +72,10 @@ public class DownloadService implements DisposableBean {
 					log.info("downloaded " + torrentItem.getName());
 					try {
 						if (downoladedFile.isFile()) {
-							FileUtils.moveFile(downoladedFile, completedFile);
+							FileUtils.moveFile(downoladedFile, completedFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
 						} else if (downoladedFile.isDirectory()) {
-							FileUtils.moveDirectory(downoladedFile, completedFile);
+							FileUtils.copyDirectory(downoladedFile, completedFile, null, true, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+							FileUtils.deleteDirectory(downoladedFile);
 						}
 					} catch (Exception e) {
 

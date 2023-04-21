@@ -116,7 +116,7 @@ public class MagnetDownloadClient {
 	 * @param listener
 	 * @param completed
 	 */
-	public synchronized void startAsync(Consumer<MagnetDownloadState> listener, BiConsumer<MagnetDownloadState, Throwable> completed) {
+	public void startAsync(Consumer<MagnetDownloadState> listener, BiConsumer<MagnetDownloadState, Throwable> completed) {
 		if (!isStarted.get()) {
 			isStarted.set(true);
 			final long startdTime = System.currentTimeMillis();

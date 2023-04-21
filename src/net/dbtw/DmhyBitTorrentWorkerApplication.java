@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import net.dbtw.orm.entity.DownloadState.State;
 import net.dbtw.orm.repository.DownloadSetRepo;
 import net.dbtw.orm.repository.DownloadStateRepoCustom;
 import net.dbtw.schedules.DmhyWorker;
@@ -34,7 +35,7 @@ public class DmhyBitTorrentWorkerApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void afterStartup() {
-		downloadStateRepoCustom.resetState();
+		downloadStateRepoCustom.resetStateIn(State.Waiting, State.Downloading);
 	}
 
 }

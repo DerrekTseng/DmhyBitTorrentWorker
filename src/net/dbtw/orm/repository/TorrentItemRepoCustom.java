@@ -17,7 +17,7 @@ public class TorrentItemRepoCustom extends CustomRepositoryBase {
 		String hql = "from TorrentItem where category=:category and name like :search";
 
 		List<TorrentItem> result = entityManager.createQuery(hql, TorrentItem.class) //
-				.setParameter("category", category) //
+				.setParameter("category", category.trim()) //
 				.setParameter("search", "%" + prefix.trim() + "%" + suffix.trim() + "%") //
 				.getResultList();
 

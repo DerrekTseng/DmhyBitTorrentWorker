@@ -45,7 +45,7 @@ public class DmhyWorker {
 	@Autowired
 	DownloadService downloadService;
 
-	@Scheduled(cron = "0/10 * * * * *")
+	@Scheduled(cron = "0 0/30 * * * *")
 	public synchronized void doWork() {
 		fetchDmhyItems();
 		updateDownloadState();
@@ -58,7 +58,7 @@ public class DmhyWorker {
 		dmhyPageRoller.rolling(1, 10, (pageNum, list) -> {
 			list.forEach(item -> {
 				if (keepRolling.get()) {
-					MagnetUri magnetUri = MagnetParser.convert(item.getUrl());
+					MagnetUri magnetUri = MagnetParser.convert(item.getMagnet());
 					String torrentId = magnetUri.getTorrentId().toString();
 					if (torrentItemRepo.existsById(torrentId)) {
 						log.info("Torrent item existed, stop fetching.");
@@ -82,13 +82,13 @@ public class DmhyWorker {
 	public synchronized void updateDownloadState() {
 		downloadSetRepo.findAll().forEach(downloadSet -> {
 			torrentItemRepoCustom.searchLike(downloadSet.getCategory(), downloadSet.getPrefix(), downloadSet.getSuffix()).forEach(torrentItem -> {
-				if (downloadStateRepo.existsById(torrentItem.getTorrentId())) {
+				if (!downloadStateRepo.existsById(torrentItem.getTorrentId())) {
 					DownloadState downloadState = new DownloadState();
 					downloadState.setTorrentId(torrentItem.getTorrentId());
 					downloadState.setDownloadingFolder(downloadSet.getDownloadingFolder());
 					downloadState.setCompleteFolder(downloadSet.getCompletedFolder());
 					downloadState.setPercentage("0.00");
-					downloadState.setState(State.Wait);
+					downloadState.setState(State.Init);
 					downloadStateRepo.save(downloadState);
 				}
 			});
@@ -97,17 +97,17 @@ public class DmhyWorker {
 
 	// Step three
 	public synchronized void startDownload() {
-		downloadStateRepoCustom.findByState(State.Wait).forEach(downloadState -> {
+		downloadStateRepoCustom.findByStateIn(State.Init).forEach(downloadState -> {
 
 			TorrentItem torrentItem = torrentItemRepo.findById(downloadState.getTorrentId()).orElse(null);
 			if (torrentItem == null) {
 				downloadState.setState(State.TorrentItemNotFound);
 			} else {
-				downloadState.setState(State.Downloading);
+				downloadState.setState(State.Waiting);
 			}
 			downloadStateRepo.save(downloadState);
 
-			if (downloadState.getState() == State.Downloading) {
+			if (downloadState.getState() == State.Waiting) {
 				downloadService.download(downloadState, torrentItem);
 			}
 		});

@@ -3,7 +3,6 @@
 		<title>Dmhy BitTorrent Worker</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script scr="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
 			rel="stylesheet"
@@ -38,21 +37,89 @@
 					</li>
 				</ul>
 			</div>
-			<div class="p-3" style="width:calc(100vw - 280px); height:100vh;flex-shrink: 0;display: flex; overflow: auto;">
-				<form action="/runWorker" method="post">
-					<input type="submit" value="Run Worker"/>
-				</form>				
-				<form action="/newSetting" method="post">
-					<input />
-					<input />
-					<input />
-					<input />
-				</form>
-				
-				<form action="/updateSetting" method="post" th:each="item : ${items}">
-				
-				</form>
-				
+			<div style="width:calc(100vw - 280px); height:100vh;flex-shrink: 0;display: flex; overflow: auto;">
+				<div class="container">
+					<div class="row pt-3">
+						<form class="row" action="/runWorker" method="post">
+							<div class="col-12 mb-3">
+								<button type="submit" class="btn btn-info float-end">Run Worker</button>
+							</div>
+						</form>	
+					</div>
+					
+					<div class="row border pt-3 mb-3 bg-light">
+						<form class="row" action="/createSetting" method="post">
+							<div class="col-6 mb-3">
+								<label for="name" class="form-label">Name</label>
+								<input type="text" name="name" id="name" class="form-control"/>
+							</div>
+							<div class="col-6 mb-3">
+								<label for="category" class="form-label">Category</label>
+								<input type="text" name="category" id="category" class="form-control"/>
+							</div>							
+							<div class="col-12 mb-3">
+								<label for="prefix" class="form-label">Prefix</label>
+								<input type="text" name="prefix" id="prefix" class="form-control" placeholder=""/>
+							</div>
+							<div class="col-12 mb-3">
+								<label for="suffix" class="form-label">Suffix</label>
+								<input type="text" name="suffix" id="suffix" class="form-control" placeholder=""/>
+							</div>
+							<div class="col-12 mb-3">
+								<label for="downloadingFolder" class="form-label">Downloading Folder</label>
+								<input type="text" name="downloadingFolder" id="downloadingFolder" class="form-control" placeholder=""/>
+							</div>
+							<div class="col-12 mb-3">
+								<label for="completedFolder" class="form-label">CompletedFolder</label>
+								<input type="text" name="completedFolder" id="completedFolder" class="form-control" placeholder=""/>
+							</div>
+							 <div class="col-12 mb-3">
+							    <button type="submit" class="btn btn-primary">Create</button>
+							 </div>							
+						</form>
+					</div>		
+					
+					<div class="row border pt-3 mb-3 bg-light" th:each="item : ${items}">
+						<form class="row" action="/updateSetting" method="post">
+							<input type="hidden" name = "rowid" th:value="${item.rowid}"/>
+							
+							<div class="col-6 mb-3">
+								<label for="name" class="form-label">Name</label>
+								<input type="text" name="name" id="name" class="form-control" th:value="${item.name}"/>
+							</div>
+							
+							<div class="col-6 mb-3">
+								<label for="category" class="form-label">Category</label>
+								<input type="text" name="category" id="category" class="form-control" th:value="${item.category}"/>
+							</div>
+							
+							<div class="col-12 mb-3">
+								<label for="prefix" class="form-label">Prefix</label>
+								<input type="text" name="prefix" id="prefix" class="form-control" th:value="${item.prefix}"/>
+							</div>
+							
+							<div class="col-12 mb-3">
+								<label for="suffix" class="form-label">Suffix</label>
+								<input type="text" name="suffix" id="suffix" class="form-control" th:value="${item.suffix}"/>
+							</div>
+							
+							<div class="col-12 mb-3">
+								<label for="downloadingFolder" class="form-label">Downloading Folder</label>
+								<input type="text" name="downloadingFolder" id="downloadingFolder" class="form-control"  th:value="${item.downloadingFolder}"/>
+							</div>
+							
+							<div class="col-12 mb-3">
+								<label for="completedFolder" class="form-label">Completed Folder</label>
+								<input type="text" name="completedFolder" id="completedFolder" class="form-control"  th:value="${item.completedFolder}"/>
+							</div>
+								
+							<div class="col-12 mb-3">
+								<button type="submit" name="action" class="btn btn-danger float-start" onclick="return confirm('Delete confirm')" value="delete">Delete</button>
+								<button type="submit" name="action" class="btn btn-success float-end" value="update">Update</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			</div>
 		</main>
 	</body>

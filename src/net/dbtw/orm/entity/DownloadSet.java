@@ -18,6 +18,9 @@ public class DownloadSet {
 	int rowid;
 
 	@Type(type = "text")
+	String name;
+	
+	@Type(type = "text")
 	String category;
 
 	@Type(type = "text")

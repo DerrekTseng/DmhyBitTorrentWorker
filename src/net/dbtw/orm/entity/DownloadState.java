@@ -12,7 +12,7 @@ import lombok.Data;
 public class DownloadState {
 
 	public static enum State {
-		Wait, Downloading, Finish, TorrentItemNotFound, Error;
+		Init, Waiting, Downloading, Finish, TorrentItemNotFound, Error;
 	}
 
 	@Id
