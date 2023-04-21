@@ -118,5 +118,16 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		
+		<resources>
+			<resource>
+                <directory>src/templates</directory>
+                <targetPath>templates</targetPath> <!-- to -->
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+		</resources>
 	</build>
+
 </project>
