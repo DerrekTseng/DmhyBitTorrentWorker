@@ -127,7 +127,14 @@
                     <include>**/*.html</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src</directory>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </resource>
 		</resources>
+		
 	</build>
 
 </project>
