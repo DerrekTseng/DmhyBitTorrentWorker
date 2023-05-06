@@ -45,7 +45,7 @@ public class DmhyWorker {
 	@Autowired
 	DownloadService downloadService;
 
-	@Scheduled(cron = "0 0/30 * * * *")
+	//@Scheduled(cron = "0 0/30 * * * *")
 	public synchronized void doWork() {
 		fetchDmhyItems();
 		updateDownloadState();

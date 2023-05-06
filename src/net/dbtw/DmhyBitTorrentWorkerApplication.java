@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,7 +20,7 @@ import net.dbtw.schedules.DmhyWorker;
 @EnableScheduling
 @SpringBootApplication
 @EnableAutoConfiguration
-public class DmhyBitTorrentWorkerApplication {
+public class DmhyBitTorrentWorkerApplication extends SpringBootServletInitializer {
 
 	@Autowired
 	DmhyWorker dmhyWorker;
@@ -28,6 +30,11 @@ public class DmhyBitTorrentWorkerApplication {
 
 	@Autowired
 	DownloadStateRepoCustom downloadStateRepoCustom;
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(DmhyBitTorrentWorkerApplication.class);
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(DmhyBitTorrentWorkerApplication.class, args);
